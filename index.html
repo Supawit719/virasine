@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korea Travel Gallery</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
+body{background:#f6fbff;}
+
+/* หน้าแรก */
+#welcome{
+width:100%;
+height:100vh;
+background:url('https://i.imgur.com/1ZQ4Uqk.jpeg') center/cover no-repeat;
+display:flex;flex-direction:column;justify-content:center;align-items:center;
+text-align:center;color:white;backdrop-filter:blur(3px);
+}
+#welcome h1{font-size:3rem;text-shadow:0 0 20px #a7d8ff;}
+#welcome button{
+margin-top:20px;padding:15px 30px;font-size:1.3rem;border:none;cursor:pointer;
+background:linear-gradient(45deg,#bde6ff,#89c8ff);
+border-radius:10px;transition:0.3s;
+}
+#welcome button:hover{transform:scale(1.1);box-shadow:0 0 25px #89c8ff;}
+
+/* Gallery */
+#gallery-page{display:none;padding:30px;}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;}
+.gallery img{
+width:100%;height:200px;object-fit:cover;border-radius:12px;cursor:pointer;
+transition:0.35s;opacity:0;transform:translateY(20px);
+}
+.gallery img.show{opacity:1;transform:translateY(0);}
+.gallery img:hover{
+transform:scale(1.08);box-shadow:0 0 25px #9dd9ff;
+filter:brightness(1.3) saturate(1.2);
+}
+
+/* หน้ารายละเอียด */
+#detailView{display:none;padding:30px;text-align:center;}
+#detailView img{width:60%;border-radius:12px;margin-bottom:15px;transition:0.4s;}
+#detailView h2{margin-bottom:10px;}
+#detailView p{max-width:700px;margin:auto;line-height:1.7;}
+button.backBtn{
+margin-top:20px;padding:10px 20px;font-size:1rem;border:none;
+background:linear-gradient(45deg,#bde6ff,#89c8ff);
+border-radius:8px;cursor:pointer;transition:0.3s;
+}
+button.backBtn:hover{transform:scale(1.05);box-shadow:0 0 15px #89c8ff;}
+</style>
+</head>
+<body>
+
+<!-- หน้าแรก -->
+<section id="welcome">
+<h1>🇰🇷 ยินดีต้อนรับสู่ ท่องเที่ยวเกาหลี</h1>
+<button onclick="startSite()">เข้าสู่เว็บไซต์</button>
+</section>
+
+<!-- หน้าแกลเลอรี -->
+<section id="gallery-page">
+<h1 style="text-align:center;margin-bottom:20px;color:#3b81c5;">สถานที่ท่องเที่ยวเกาหลี</h1>
+<div class="gallery" id="gallery"></div>
+</section>
+
+<!-- หน้าแสดงรายละเอียด -->
+<section id="detailView">
+<img id="detailImg">
+<h2 id="detailTitle"></h2>
+<p id="detailText"></p>
+<button class="backBtn" onclick="backToGallery()">ย้อนกลับ</button>
+</section>
+
+<script>
+function startSite(){
+document.getElementById("welcome").style.display="none";
+document.getElementById("gallery-page").style.display="block";
+showImages();
+}
+
+const data = [
+{title:"โซล (Seoul)",img:"https://i.imgur.com/gqTdLSw.jpeg",text:"เมืองหลวงสุดทันสมัย เต็มไปด้วยวัฒนธรรม คาเฟ่ แฟชั่น และประวัติศาสตร์"},
+{title:"ปูซาน (Busan)",img:"https://i.imgur.com/bMC6TO1.jpeg",text:"เมืองริมทะเลยอดนิยม มีหาดสวย อาหารทะเลสด และวัดริมผา"},
+{title:"เกาะเชจู (Jeju Island)",img:"https://i.imgur.com/eFgWIoi.jpeg",text:"เกาะสวรรค์ธรรมชาติ ภูเขาไฟ น้ำตก ทุ่งดอกไม้ และวิวทะเลสวยงาม"},
+{title:"คลองชองกเยชอน",img:"https://i.imgur.com/8qkrNcc.jpeg",text:"ลำธารกลางเมืองโซล เหมาะแก่การเดินเล่นและถ่ายรูปตอนกลางคืน"},
+{title:"พระราชวังเคียงบกกุง",img:"https://i.imgur.com/kz28p2j.jpeg",text:"พระราชวังสำคัญที่งดงาม พร้อมชุดฮันบกและสถาปัตยกรรมดั้งเดิม"},
+{title:"หมู่บ้านบุกชอนฮันอก",img:"https://i.imgur.com/xvuqroc.jpeg",text:"หมู่บ้านเกาหลีโบราณ เหมาะสำหรับถ่ายภาพวัฒนธรรม"},
+{title:"ทงแดมุน",img:"https://i.imgur.com/SkQYiS8.jpeg",text:"สวรรค์นักช้อปและที่ตั้ง Dongdaemun Design Plaza"},
+{title:"ฮงแด",img:"https://i.imgur.com/C8okb4A.jpeg",text:"ย่านวัยรุ่น คาเฟ่สวย แฟชั่นและดนตรีริมถนน"},
+{title:"กังนัม",img:"https://i.imgur.com/PYkl4Wi.jpeg",text:"ย่านทันสมัย ไฮโซ ร้านหรู และ K-POP agency zone"},
+{title:"นามิ",img:"https://i.imgur.com/jaofiAu.jpeg",text:"เกาะโรแมนติกจากซีรีส์ Winter Sonata"},
+{title:"หอคอยโซล N Tower",img:"https://i.imgur.com/3Te8D5e.jpeg",text:"จุดชมวิวเมืองโซลและล็อคคู่รัก"},
+{title:"ตลาดเมียงดง",img:"https://i.imgur.com/EDo6E2H.jpeg",text:"แหล่งช้อปปิ้งและสตรีทฟู้ดอันดับหนึ่ง"},
+{title:"คยองจู",img:"https://i.imgur.com/4f5z2pK.jpeg",text:"เมืองมรดกโลก เต็มไปด้วยวัดและโบราณสถาน"},
+{title:"ปูซาน ฮอยอุนแด",img:"https://i.imgur.com/UavpJ0j.jpeg",text:"ชายหาดยอดนิยม ร้านอาหารวิวทะเล"},
+{title:"วัดแฮดงยงกุงซา",img:"https://i.imgur.com/j5mU8SP.jpeg",text:"วัดริมทะเลที่สวยที่สุดแห่งหนึ่งในเกาหลี"},
+{title:"ซองโด อินชอน",img:"https://i.imgur.com/8o0rUQ6.jpeg",text:"เมืองทันสมัยแห่งอนาคต"},
+{title:"สวนสนุกล็อตเต้เวิลด์",img:"https://i.imgur.com/Yz0tGJx.jpeg",text:"สวนสนุกในร่มและปราสาทสุดโรแมนติก"},
+{title:"ป้อมฮวาซอง ซูวอน",img:"https://i.imgur.com/d7pZ4yd.jpeg",text:"มรดกโลกยูเนสโกเต็มไปด้วยประวัติศาสตร์"},
+{title:"โซลฟอเรสต์",img:"https://i.imgur.com/p6TQwx9.jpeg",text:"สวนใหญ่เหมาะเดินเล่นและปิกนิก"},
+{title:"ซอรัคซาน",img:"https://i.imgur.com/pB0sS0e.jpeg",text:"ภูเขาธรรมชาติสุดอลัง กิจกรรมปีนเขาและเคเบิลคาร์"},
+{title:"พิพิธภัณฑ์สันติภาพ DMZ",img:"https://i.imgur.com/voUqs9S.jpeg",text:"เรียนรู้ประวัติศาสตร์แบ่งแผ่นดินเกาหลี"}
+];
+
+const gallery = document.getElementById("gallery");
+data.forEach((place,i)=>{
+let img=document.createElement("img");
+img.src=place.img;
+img.onclick=()=>showDetail(i);
+gallery.appendChild(img);
+});
+
+/* ค่อยๆโผล่ */
+function showImages(){
+document.querySelectorAll(".gallery img").forEach((img,i)=>{
+setTimeout(()=>img.classList.add("show"),100*i);
+});
+}
+
+function showDetail(i){
+document.getElementById("gallery-page").style.display="none";
+document.getElementById("detailView").style.display="block";
+detailImg.src=data[i].img;
+detailTitle.innerText=data[i].title;
+detailText.innerText=data[i].text;
+}
+function backToGallery(){
+document.getElementById("detailView").style.display="none";
+document.getElementById("gallery-page").style.display="block";
+}
+</script>
+</body>
+</html>
